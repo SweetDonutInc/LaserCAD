@@ -1,0 +1,19 @@
+﻿<Window x:Class="laserPj.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:laserPj"
+        mc:Ignorable="d"
+        Title="Генератор раскроя dxf" Height="720" Width="1280">
+    <Grid>
+        <Button Margin="26,42,928,579" Content="Создать папку для сохранения DXF файлов" Click="SaveDxf_Click"/>
+        <TextBlock Name="directory" Margin="400,42,278,579" Text="Путь к каталогу с DXF файлами" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
+
+        <Button Name="dirRelBtn" Margin="26,142,928,479" Content="Создать папку для сохранения DXF файлов (Ral)" Click="SaveDxfRal_Click" Visibility="Hidden"/>
+        <TextBlock Name="directoryRel" Margin="400,142,278,479" Text="Путь к каталогу с DXF файлами (Ral)" TextAlignment="Left" Visibility="Hidden" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
+
+        <Button Name="excbtn" Margin="26,240,928,381" Content="Загрузить файл Excel из программы куб" Click="OpenCubeExcel_Click" Visibility="Hidden"/>
+        <TextBlock Name="excel_path" Margin="400,240,278,381" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS" Visibility="Hidden" Foreground="Black"/>
+    </Grid>
+</Window>

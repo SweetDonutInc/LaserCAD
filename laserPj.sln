@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1321
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "laserPj", "laserPj\laserPj.csproj", "{28A3E083-866B-4C21-8630-159F8AC340BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{28A3E083-866B-4C21-8630-159F8AC340BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28A3E083-866B-4C21-8630-159F8AC340BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28A3E083-866B-4C21-8630-159F8AC340BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28A3E083-866B-4C21-8630-159F8AC340BC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B22BD59C-0AF8-4259-A058-8112F446DF42}
+	EndGlobalSection
+EndGlobal
