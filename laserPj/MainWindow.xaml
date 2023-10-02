@@ -9,6 +9,10 @@
     <Grid>
         <Button Margin="26,42,928,579" Content="Создать папку для сохранения DXF файлов" Click="SaveDxf_Click"/>
         <TextBlock Name="directory" Margin="400,42,278,579" Text="Путь к каталогу с DXF файлами" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
+        
+        <TextBox x:Name="orderNum_int" BorderThickness="3" BorderBrush="Black" Margin="26,52,988,-220" TextAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS" Height="51"/>
+
+        <TextBlock Name="orderNum" Margin="26,503,988,145" Text="Введите номер заказа" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS" Height="41"/>
 
         <Button Name="dirRelBtn" Margin="26,142,928,479" Content="Создать папку для сохранения DXF файлов (Ral)" Click="SaveDxfRal_Click" Visibility="Hidden"/>
         <TextBlock Name="directoryRel" Margin="400,142,278,479" Text="Путь к каталогу с DXF файлами (Ral)" TextAlignment="Left" Visibility="Hidden" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>

@@ -66,7 +66,7 @@ namespace laserPj
                 {
                     excelList.Add(new ExcelCubeData
                     {
-                        lineNum = i+1,
+                        lineNum = i + 1,
                         mark = sheet.GetRow(i).GetCell(0).StringCellValue,
                         type = sheet.GetRow(i).GetCell(1).StringCellValue,
                         article = sheet.GetRow(i).GetCell(2).StringCellValue,
@@ -109,18 +109,28 @@ namespace laserPj
                 model.Entities.Add(new DxfLine(new Point2D(border, 0), new Point2D(border, border)));
                 model.Entities.Add(new DxfLine(new Point2D(border, border), new Point2D(0, border)));
                 // Линии нарисованы
+
                 //Добавляем гравировку
-                string grav = tempExcelList[i].mark + " " + tempExcelList[i].type[0] + " " + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString();
+                string grav = orderNum_int.Text + " "
+                    + tempExcelList[i].mark + " "
+                    + tempExcelList[i].type[0] + " "
+                    + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString()
+                    + "_" + tempExcelList[i].article[0];
 
                 model.Entities.Add(
                 new DxfMText(grav, new Point3D(border + 5, border/2, 0), 5d)
                 {
                     Color = EntityColors.Green
                 });
-                
+
                 //Собираем имя файла
-                string filename = tempExcelList[i].lineNum.ToString() + "_" +
-                    tempExcelList[i].mark + " " + tempExcelList[i].type[0] + " " + tempExcelList[i].name + "_" + tempExcelList[i].count.ToString();
+                string tempRal = tempExcelList[i].name.Contains("RAL") ? "RAL" : "Нерж";
+
+                string filename = tempExcelList[i].lineNum.ToString() + "_"
+                    +tempExcelList[i].mark + " "
+                    + tempExcelList[i].type[0] + " "
+                    + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString() + "_"
+                    + tempExcelList[i].article[0] + "_" + tempRal + "_" + tempExcelList[i].count.ToString() + "шт";
                 //Записываем файл
                 if (tempExcelList[i].name.Contains("RAL"))
                 {
