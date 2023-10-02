@@ -15,9 +15,12 @@
         <TextBlock Name="orderNum" Margin="26,503,988,145" Text="Введите номер заказа" TextAlignment="Center" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS" Height="41"/>
 
         <Button Name="dirRelBtn" Margin="26,142,928,479" Content="Создать папку для сохранения DXF файлов (Ral)" Click="SaveDxfRal_Click" Visibility="Hidden"/>
-        <TextBlock Name="directoryRel" Margin="400,142,278,479" Text="Путь к каталогу с DXF файлами (Ral)" TextAlignment="Left" Visibility="Hidden" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
+        <TextBlock Name="directoryRal" Margin="400,142,278,479" Text="Путь к каталогу с DXF файлами (Ral)" TextAlignment="Left" Visibility="Hidden" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
 
-        <Button Name="excbtn" Margin="26,240,928,381" Content="Загрузить файл Excel из программы куб" Click="OpenCubeExcel_Click" Visibility="Hidden"/>
-        <TextBlock Name="excel_path" Margin="400,240,278,381" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS" Visibility="Hidden" Foreground="Black"/>
+        <Button Name="MA" Margin="26,240,1097,381" Content="MountAir" Click="MountAir_Click" Visibility="Hidden"/>
+        <Button Name="AW" Margin="199,240,927,381" Content="AirWay" Click="AirWay_Click" Visibility="Hidden"/>
+        
+        <Button Name="excbtn" Margin="27,340,926.6,281.4" Content="Загрузить файл Excel из программы куб" Click="OpenCubeExcel_Click" Visibility="Hidden"/>
+        <TextBlock Name="excel_path" Margin="400,363,277.6,299.4" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS" Visibility="Hidden" Foreground="Black"/>
     </Grid>
 </Window>

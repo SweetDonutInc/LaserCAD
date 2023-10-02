@@ -28,6 +28,7 @@ namespace laserPj
     {
 
         List<ExcelCubeData> excelList = new List<ExcelCubeData>(); //В этот лист записываются строки из таблицы Ecxel, сгенерированной в Кубе
+        public bool isMountAir { get; set; }
 
         public MainWindow()
         {
@@ -59,9 +60,7 @@ namespace laserPj
 
             for (int i = 4; i < sheet.LastRowNum; i++) // Первые 4 строки не содержат данных, поэтому начинаем с 4 индекса (5 строка)
             {
-                // Добавляем в лист всё, что содержит борты
-                // MA - П42: борты 23мм; П54: борты 35мм
-                // АW - !!!заполнить потом!!!
+                // Добавляем в лист всё, что содержит борты и не содержит "Отверстие" потому что пока вырезать мы не умеем
                 if (sheet.GetRow(i).GetCell(3).StringCellValue.Contains("борты") && !sheet.GetRow(i).GetCell(3).StringCellValue.Contains("с отверстием"))
                 {
                     excelList.Add(new ExcelCubeData
@@ -78,10 +77,17 @@ namespace laserPj
                     });
                 }
             }
-            createFilesForCad(excelList);
+            if (isMountAir)
+            {
+                MountAir_createFilesForCad(excelList);
+            }
+            else
+            {
+                AirWay_createFilesForCad(excelList);
+            }
         }
 
-        private void createFilesForCad(List<ExcelCubeData> excelList) // Метод для создания команды для командной строки в автокаде
+        private void MountAir_createFilesForCad(List<ExcelCubeData> excelList) // Метод для создания файлов dxf MA
         {
             List<ExcelCubeData> tempExcelList = new List<ExcelCubeData>(excelList); // Копия основного листа со всеми строками (для удобства работы)
             int[] pointsX = new int[12]; // Массив для хранения точек по которым будем рисовать чертёж (x координаты точек)
@@ -134,7 +140,7 @@ namespace laserPj
                 //Записываем файл
                 if (tempExcelList[i].name.Contains("RAL"))
                 {
-                    DxfWriter.Write($@"{directoryRel.Text}\{filename}.dxf", model);
+                    DxfWriter.Write($@"{directoryRal.Text}\{filename}.dxf", model);
                 }
                 else
                 {
@@ -142,7 +148,76 @@ namespace laserPj
                 }
             }
 
-            excel_path.Text = "Файлы успешно созданы";
+            excel_path.Text = "Файлы по листу МА успешно созданы";
+            excel_path.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
+        }
+
+        private void AirWay_createFilesForCad(List<ExcelCubeData> excelList) // Метод для создания файлов dxf AW
+        {
+            List<ExcelCubeData> tempExcelList = new List<ExcelCubeData>(excelList); // Копия основного листа со всеми строками (для удобства работы)
+            int[] pointsX = new int[12]; // Массив для хранения точек по которым будем рисовать чертёж (x координаты точек)
+            int[] pointsY = new int[12]; // Массив для хранения точек по которым будем рисовать чертёж (у координаты точек)
+
+            for (int i = 0; i < tempExcelList.Count; i++)
+            {
+                DxfModel model = new DxfModel(); // Создаём пустой файл
+
+                int border = 0;
+                if (tempExcelList[i].name.Contains("23мм")) border = 23;
+                if (tempExcelList[i].name.Contains("24мм")) border = 24;
+                if (tempExcelList[i].name.Contains("43мм")) border = 43;
+                if (tempExcelList[i].name.Contains("44мм")) border = 44;
+
+                int newWidth = tempExcelList[i].width - (2 * border); // Ширина листа без бортов
+                int newHeight = tempExcelList[i].height - (2 * border); // Высота листа без бортов
+
+                // Рисуем линии по точкам
+                model.Entities.Add(new DxfLine(new Point2D(0, border), new Point2D(0, newHeight + border)));
+                model.Entities.Add(new DxfLine(new Point2D(0, newHeight + border), new Point2D(border, newHeight + border)));
+                model.Entities.Add(new DxfLine(new Point2D(border, newHeight + border), new Point2D(border, newHeight + (2 * border))));
+                model.Entities.Add(new DxfLine(new Point2D(border, newHeight + (2 * border)), new Point2D(newWidth + border, newHeight + (2 * border))));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + border, newHeight + (2 * border)), new Point2D(newWidth + border, newHeight + border)));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + border, newHeight + border), new Point2D(newWidth + (2 * border), newHeight + border)));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + (2 * border), newHeight + border), new Point2D(newWidth + (2 * border), border)));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + (2 * border), border), new Point2D(newWidth + border, border)));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + border, border), new Point2D(newWidth + border, 0)));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + border, 0), new Point2D(border, 0)));
+                model.Entities.Add(new DxfLine(new Point2D(border, 0), new Point2D(border, border)));
+                model.Entities.Add(new DxfLine(new Point2D(border, border), new Point2D(0, border)));
+                // Линии нарисованы
+
+                //Добавляем гравировку
+                string grav = orderNum_int.Text + " "
+                    + tempExcelList[i].mark + " "
+                    + tempExcelList[i].type[0] + " "
+                    + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString();
+
+                model.Entities.Add(
+                new DxfMText(grav, new Point3D(border + 5, border / 2, 0), 5d)
+                {
+                    Color = EntityColors.Green
+                });
+
+                //Собираем имя файла
+                string tempRal = tempExcelList[i].name.Contains("RAL") ? "Ral 0.5" : "оц 0.7";
+
+                string filename = tempExcelList[i].lineNum.ToString() + "_"
+                    + tempExcelList[i].mark + " "
+                    + tempExcelList[i].type[0] + " "
+                    + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString() + "_"
+                    + tempExcelList[i].name[0] + "_" + tempRal + "_" + tempExcelList[i].count.ToString() + "шт";
+                //Записываем файл
+                if (tempExcelList[i].name.Contains("RAL"))
+                {
+                    DxfWriter.Write($@"{directoryRal.Text}\{filename}.dxf", model);
+                }
+                else
+                {
+                    DxfWriter.Write($@"{directory.Text}\{filename}.dxf", model);
+                }
+            }
+
+            excel_path.Text = "Файлы по листу AW успешно созданы";
             excel_path.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
         }
 
@@ -155,7 +230,7 @@ namespace laserPj
                 DirectoryInfo dirInfo = new DirectoryInfo(saveFileDialog1.FileName);
                 dirInfo.Create();
                 directory.Text = dirInfo.FullName;
-                directoryRel.Visibility = Visibility.Visible;
+                directoryRal.Visibility = Visibility.Visible;
                 dirRelBtn.Visibility = Visibility.Visible;
             }
         }
@@ -168,10 +243,28 @@ namespace laserPj
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(saveFileDialog1.FileName);
                 dirInfo.Create();
-                directoryRel.Text = dirInfo.FullName;
-                excbtn.Visibility = Visibility.Visible;
-                excel_path.Visibility = Visibility.Visible;
+                directoryRal.Text = dirInfo.FullName;
+                MA.Visibility = Visibility.Visible;
+                AW.Visibility = Visibility.Visible;
             }
+        }
+
+        private void MountAir_Click(object sender, RoutedEventArgs e)
+        {
+            isMountAir = true;
+            MA.Opacity = 1f;
+            AW.Opacity = 0.5f;
+            excbtn.Visibility = Visibility.Visible;
+            excel_path.Visibility = Visibility.Visible;
+        }
+
+        private void AirWay_Click(object sender, RoutedEventArgs e)
+        {
+            isMountAir = false;
+            AW.Opacity = 1f;
+            MA.Opacity = 0.5f;
+            excbtn.Visibility = Visibility.Visible;
+            excel_path.Visibility = Visibility.Visible;
         }
     }
 
