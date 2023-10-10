@@ -116,10 +116,15 @@ namespace laserPj
                 model.Entities.Add(new DxfLine(new Point2D(border, border), new Point2D(0, border)));
                 // Линии нарисованы
 
+                string t = "";
+                if (tempExcelList[i].type.Contains("Глухая")) t = "Г";
+                if (tempExcelList[i].type.Contains("Сервис")) t = "С";
+                if (tempExcelList[i].type.Contains("Створка")) t = "О";
+
                 //Добавляем гравировку
                 string grav = orderNum_int.Text + " "
                     + tempExcelList[i].mark + " "
-                    + tempExcelList[i].type[0] + " "
+                    + t + " "
                     + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString()
                     + "_" + tempExcelList[i].article[0];
 
@@ -134,7 +139,7 @@ namespace laserPj
 
                 string filename = tempExcelList[i].lineNum.ToString() + "_"
                     +tempExcelList[i].mark + " "
-                    + tempExcelList[i].type[0] + " "
+                    + t + " "
                     + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString() + "_"
                     + tempExcelList[i].article[0] + "_" + tempRal + "_" + tempExcelList[i].count.ToString() + "шт";
                 //Записываем файл
@@ -186,10 +191,15 @@ namespace laserPj
                 model.Entities.Add(new DxfLine(new Point2D(border, border), new Point2D(0, border)));
                 // Линии нарисованы
 
+                string t = "";
+                if (tempExcelList[i].type.Contains("Глухая")) t = "Г";
+                if (tempExcelList[i].type.Contains("Сервис")) t = "С";
+                if (tempExcelList[i].type.Contains("Открывающаяся")) t = "О";
+
                 //Добавляем гравировку
                 string grav = orderNum_int.Text + " "
                     + tempExcelList[i].mark + " "
-                    + tempExcelList[i].type[0] + " "
+                    + t + " "
                     + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString();
 
                 model.Entities.Add(
@@ -203,7 +213,7 @@ namespace laserPj
 
                 string filename = tempExcelList[i].lineNum.ToString() + "_"
                     + tempExcelList[i].mark + " "
-                    + tempExcelList[i].type[0] + " "
+                    + t + " "
                     + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString() + "_"
                     + tempExcelList[i].name[0] + "_" + tempRal + "_" + tempExcelList[i].count.ToString() + "шт";
                 //Записываем файл
