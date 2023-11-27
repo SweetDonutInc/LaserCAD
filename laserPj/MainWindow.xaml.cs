@@ -14,10 +14,7 @@ using WW.Cad.Model.Entities;
 using WW.Math;
 using System.Threading;
 using System.Windows.Media;
-using System;
 using System.ComponentModel;
-using System.Threading;
-using System.Windows;
 
 namespace laserPj
 {
@@ -60,8 +57,8 @@ namespace laserPj
 
             for (int i = 4; i < sheet.LastRowNum; i++) // Первые 4 строки не содержат данных, поэтому начинаем с 4 индекса (5 строка)
             {
-                // Добавляем в лист всё, что содержит борты и не содержит "Отверстие" потому что пока вырезать мы не умеем
-                if (sheet.GetRow(i).GetCell(3).StringCellValue.Contains("борты") && !sheet.GetRow(i).GetCell(3).StringCellValue.Contains("с отверстием"))
+                // Добавляем в лист всё, что содержит борты
+                if (sheet.GetRow(i).GetCell(3).StringCellValue.Contains("борты"))
                 {
                     excelList.Add(new ExcelCubeData
                     {
@@ -73,7 +70,9 @@ namespace laserPj
                         width = (int)sheet.GetRow(i).GetCell(4).NumericCellValue,
                         height = (int)sheet.GetRow(i).GetCell(5).NumericCellValue,
                         count = (int)sheet.GetRow(i).GetCell(6).NumericCellValue,
-                        mass = (int)sheet.GetRow(i).GetCell(7).NumericCellValue
+                        mass = (int)sheet.GetRow(i).GetCell(7).NumericCellValue,
+                        holeWidth = sheet.GetRow(i).GetCell(8).NumericCellValue,
+                        holeHeight = sheet.GetRow(i).GetCell(9).NumericCellValue
                     });
                 }
             }
@@ -90,8 +89,6 @@ namespace laserPj
         private void MountAir_createFilesForCad(List<ExcelCubeData> excelList) // Метод для создания файлов dxf MA
         {
             List<ExcelCubeData> tempExcelList = new List<ExcelCubeData>(excelList); // Копия основного листа со всеми строками (для удобства работы)
-            int[] pointsX = new int[12]; // Массив для хранения точек по которым будем рисовать чертёж (x координаты точек)
-            int[] pointsY = new int[12]; // Массив для хранения точек по которым будем рисовать чертёж (у координаты точек)
 
             for (int i = 0; i < tempExcelList.Count; i++)
             {
@@ -101,7 +98,7 @@ namespace laserPj
                 int newWidth = tempExcelList[i].width - (2 * border); // Ширина листа без бортов
                 int newHeight = tempExcelList[i].height - (2 * border); // Высота листа без бортов
 
-                // Рисуем линии по точкам
+                // Рисуем линии основной фигуры
                 model.Entities.Add(new DxfLine(new Point2D(0, border), new Point2D(0, newHeight + border)));
                 model.Entities.Add(new DxfLine(new Point2D(0, newHeight + border), new Point2D(border, newHeight + border)));
                 model.Entities.Add(new DxfLine(new Point2D(border, newHeight + border), new Point2D(border, newHeight + (2 * border))));
@@ -115,6 +112,22 @@ namespace laserPj
                 model.Entities.Add(new DxfLine(new Point2D(border, 0), new Point2D(border, border)));
                 model.Entities.Add(new DxfLine(new Point2D(border, border), new Point2D(0, border)));
                 // Линии нарисованы
+
+                //Добавляем вырез
+                double tw = tempExcelList[i].width;
+                double hw = tempExcelList[i].holeWidth;
+                double n = (tw - hw) / 2;
+
+                double th = tempExcelList[i].height;
+                double hh = tempExcelList[i].holeHeight;
+                double m = (th - hh) / 2;
+
+                model.Entities.Add(new DxfLine(new Point2D(n,m), new Point2D(n, m + hh)));
+                model.Entities.Add(new DxfLine(new Point2D(n, m + hh), new Point2D(n + hw, m + hh)));
+                model.Entities.Add(new DxfLine(new Point2D(n + hw, m + hh), new Point2D(n + hw, m)));
+                model.Entities.Add(new DxfLine(new Point2D(n + hw, m), new Point2D(n,m)));
+
+                //Вырез добавлен
 
                 string t = "";
                 if (tempExcelList[i].type.Contains("Глухая")) t = "Г";
@@ -137,11 +150,14 @@ namespace laserPj
                 //Собираем имя файла
                 string tempRal = tempExcelList[i].name.Contains("RAL") ? "RAL" : "Нерж";
 
+                string crop = hw > 0 ? $"(Вырез {hw} x {hh})" : "";
+
                 string filename = tempExcelList[i].lineNum.ToString() + "_"
-                    +tempExcelList[i].mark + " "
+                    + tempExcelList[i].mark + " "
                     + t + " "
                     + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString() + "_"
-                    + tempExcelList[i].article[0] + "_" + tempRal + "_" + tempExcelList[i].count.ToString() + "шт";
+                    + tempExcelList[i].article[0] + "_" + tempRal + "_" + tempExcelList[i].count.ToString() + "шт"
+                    + crop;
                 //Записываем файл
                 if (tempExcelList[i].name.Contains("RAL"))
                 {
@@ -160,8 +176,6 @@ namespace laserPj
         private void AirWay_createFilesForCad(List<ExcelCubeData> excelList) // Метод для создания файлов dxf AW
         {
             List<ExcelCubeData> tempExcelList = new List<ExcelCubeData>(excelList); // Копия основного листа со всеми строками (для удобства работы)
-            int[] pointsX = new int[12]; // Массив для хранения точек по которым будем рисовать чертёж (x координаты точек)
-            int[] pointsY = new int[12]; // Массив для хранения точек по которым будем рисовать чертёж (у координаты точек)
 
             for (int i = 0; i < tempExcelList.Count; i++)
             {
@@ -191,6 +205,22 @@ namespace laserPj
                 model.Entities.Add(new DxfLine(new Point2D(border, border), new Point2D(0, border)));
                 // Линии нарисованы
 
+                //Добавляем вырез
+                double tw = tempExcelList[i].width;
+                double hw = tempExcelList[i].holeWidth;
+                double n = (tw - hw) / 2;
+
+                double th = tempExcelList[i].height;
+                double hh = tempExcelList[i].holeHeight;
+                double m = (th - hh) / 2;
+
+                model.Entities.Add(new DxfLine(new Point2D(n, m), new Point2D(n, m + hh)));
+                model.Entities.Add(new DxfLine(new Point2D(n, m + hh), new Point2D(n + hw, m + hh)));
+                model.Entities.Add(new DxfLine(new Point2D(n + hw, m + hh), new Point2D(n + hw, m)));
+                model.Entities.Add(new DxfLine(new Point2D(n + hw, m), new Point2D(n, m)));
+
+                //Вырез добавлен
+
                 string t = "";
                 if (tempExcelList[i].type.Contains("Глухая")) t = "Г";
                 if (tempExcelList[i].type.Contains("Сервис")) t = "С";
@@ -211,11 +241,13 @@ namespace laserPj
                 //Собираем имя файла
                 string tempRal = tempExcelList[i].name.Contains("RAL") ? "Ral 0.5" : "оц 0.7";
 
+                string crop = hw > 0 ? $"(Вырез {hw} x {hh})" : "";
+
                 string filename = tempExcelList[i].lineNum.ToString() + "_"
                     + tempExcelList[i].mark + " "
                     + t + " "
                     + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString() + "_"
-                    + tempExcelList[i].name[0] + "_" + tempRal + "_" + tempExcelList[i].count.ToString() + "шт";
+                    + tempExcelList[i].name[0] + "_" + tempRal + "_" + tempExcelList[i].count.ToString() + "шт" + crop;
                 //Записываем файл
                 if (tempExcelList[i].name.Contains("RAL"))
                 {
@@ -291,5 +323,7 @@ namespace laserPj
         public int height; //Высота
         public int count; //Количество
         public int mass; //Масса
+        public double holeWidth; //Ширина выреза
+        public double holeHeight; //Высота выреза
     }
 }
