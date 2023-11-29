@@ -140,12 +140,23 @@ namespace laserPj
                     + t + " "
                     + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString()
                     + "_" + tempExcelList[i].article[0];
-
-                model.Entities.Add(
-                new DxfMText(grav, new Point3D(border + 5, border/2, 0), 5d)
+                DxfText gravText;
+                if (newWidth < 160)
                 {
-                    Color = EntityColors.Green
-                });
+                    gravText = new DxfText(grav, new Point3D(border / 2, newHeight + border - 5, 0), 5d)
+                    {
+                        Color = EntityColors.Green,
+                        Rotation = -(Math.PI / 2)
+                    };
+                }
+                else
+                {
+                    gravText = new DxfText(grav, new Point3D(border + 5, border / 2, 0), 5d)
+                    {
+                        Color = EntityColors.Green
+                    };
+                }
+                model.Entities.Add(gravText);
 
                 //Собираем имя файла
                 string tempRal = tempExcelList[i].name.Contains("RAL") ? "RAL" : "Нерж";
