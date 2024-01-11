@@ -8,9 +8,11 @@ using NPOI.XSSF.UserModel;
 using NPOI.SS.Util;
 using NPOI.HSSF.Util;
 using NPOI.HSSF.UserModel;
+using WW.Cad.Base;
 using WW.Cad.IO;
 using WW.Cad.Model;
 using WW.Cad.Model.Entities;
+using WW.Cad.Model.Tables;
 using WW.Math;
 using System.Threading;
 using System.Windows.Media;
@@ -134,12 +136,13 @@ namespace laserPj
                 if (tempExcelList[i].type.Contains("Сервис")) t = "С";
                 if (tempExcelList[i].type.Contains("Створка")) t = "О";
 
-                //Добавляем гравировку
+                //Добавляем гравировку (ВРЕМЕННО НЕ ДЕЛАЕМ ГРАВИРОВКУ)
                 string grav = orderNum_int.Text + " "
                     + tempExcelList[i].mark + " "
                     + t + " "
                     + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString()
                     + "_" + tempExcelList[i].article[0];
+
                 DxfText gravText;
                 if (newWidth < 160)
                 {
@@ -156,6 +159,15 @@ namespace laserPj
                         Color = EntityColors.Green
                     };
                 }
+
+                DxfTextStyle textStyle = new DxfTextStyle("MYSTYLE", "Files/arial.ttf");
+                model.TextStyles.Add(textStyle);
+                gravText.Style = textStyle;
+
+                DxfLayer layer = new DxfLayer("textLayer");
+                model.Layers.Add(layer);
+                gravText.Layer = layer;
+
                 model.Entities.Add(gravText);
 
                 //Собираем имя файла
@@ -241,13 +253,35 @@ namespace laserPj
                 string grav = orderNum_int.Text + " "
                     + tempExcelList[i].mark + " "
                     + t + " "
-                    + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString();
+                    + tempExcelList[i].width.ToString() + "x" + tempExcelList[i].height.ToString()
+                    + "_" + tempExcelList[i].article[0];
 
-                model.Entities.Add(
-                new DxfMText(grav, new Point3D(border + 5, border / 2, 0), 5d)
+                DxfText gravText;
+                if (newWidth < 160)
                 {
-                    Color = EntityColors.Green
-                });
+                    gravText = new DxfText(grav, new Point3D(border / 2, newHeight + border - 5, 0), 5d)
+                    {
+                        Color = EntityColors.Green,
+                        Rotation = -(Math.PI / 2)
+                    };
+                }
+                else
+                {
+                    gravText = new DxfText(grav, new Point3D(border + 5, border / 2, 0), 5d)
+                    {
+                        Color = EntityColors.Green
+                    };
+                }
+
+                DxfTextStyle textStyle = new DxfTextStyle("MYSTYLE", "Files/arial.ttf");
+                model.TextStyles.Add(textStyle);
+                gravText.Style = textStyle;
+
+                DxfLayer layer = new DxfLayer("textLayer");
+                model.Layers.Add(layer);
+                gravText.Layer = layer;
+
+                model.Entities.Add(gravText);
 
                 //Собираем имя файла
                 string tempRal = tempExcelList[i].name.Contains("RAL") ? "Ral 0.5" : "оц 0.7";
