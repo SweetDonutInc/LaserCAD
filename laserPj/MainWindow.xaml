@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:laserPj"
         mc:Ignorable="d"
-        Title="Генератор раскроя dxf" Height="720" Width="1280">
+        Title="Генератор раскроя dxf" Height="720" Width="1280" ResizeMode="CanMinimize">
     <Grid>
         <Button Width="280" Height="60" Margin="0,0,900,350" Content="Создать папку для сохранения DXF файлов" Click="SaveDxf_Click"/>
         <TextBlock Name="directory" Width="700" Height="60" Margin="100,0,0,320" Text="Путь к каталогу с DXF файлами" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>

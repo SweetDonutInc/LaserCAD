@@ -26,6 +26,9 @@ namespace laserPj
     public partial class MainWindow : Window
     {
 
+        private readonly string fontPath = "Files/ISOCPEUR.ttf";
+        private readonly double fontSize = 8d;
+
         List<ExcelCubeData> excelList = new List<ExcelCubeData>(); //В этот лист записываются строки из таблицы Ecxel, сгенерированной в Кубе
         public bool isMountAir { get; set; }
 
@@ -136,7 +139,7 @@ namespace laserPj
                 if (tempExcelList[i].type.Contains("Сервис")) t = "С";
                 if (tempExcelList[i].type.Contains("Створка")) t = "О";
 
-                //Добавляем гравировку (ВРЕМЕННО НЕ ДЕЛАЕМ ГРАВИРОВКУ)
+                //Добавляем гравировку
                 string grav = orderNum_int.Text + " "
                     + tempExcelList[i].mark + " "
                     + t + " "
@@ -146,21 +149,18 @@ namespace laserPj
                 DxfText gravText;
                 if (newWidth < 160)
                 {
-                    gravText = new DxfText(grav, new Point3D(border / 2, newHeight + border - 5, 0), 5d)
+                    gravText = new DxfText(grav, new Point3D(border / 2, newHeight + border - 5, 0), fontSize)
                     {
-                        Color = EntityColors.Green,
                         Rotation = -(Math.PI / 2)
                     };
                 }
                 else
                 {
-                    gravText = new DxfText(grav, new Point3D(border + 5, border / 2, 0), 5d)
-                    {
-                        Color = EntityColors.Green
-                    };
+                    gravText = new DxfText(grav, new Point3D(border + 5, border / 2, 0), fontSize);
                 }
 
-                DxfTextStyle textStyle = new DxfTextStyle("MYSTYLE", "Files/arial.ttf");
+                gravText.Color = EntityColors.Green;
+                DxfTextStyle textStyle = new DxfTextStyle("MYSTYLE", "Files/ISOCPEUR.ttf");
                 model.TextStyles.Add(textStyle);
                 gravText.Style = textStyle;
 
@@ -259,21 +259,18 @@ namespace laserPj
                 DxfText gravText;
                 if (newWidth < 160)
                 {
-                    gravText = new DxfText(grav, new Point3D(border / 2, newHeight + border - 5, 0), 5d)
+                    gravText = new DxfText(grav, new Point3D(border / 2, newHeight + border - 5, 0), fontSize)
                     {
-                        Color = EntityColors.Green,
                         Rotation = -(Math.PI / 2)
                     };
                 }
                 else
                 {
-                    gravText = new DxfText(grav, new Point3D(border + 5, border / 2, 0), 5d)
-                    {
-                        Color = EntityColors.Green
-                    };
+                    gravText = new DxfText(grav, new Point3D(border + 5, border / 2, 0), fontSize);
                 }
 
-                DxfTextStyle textStyle = new DxfTextStyle("MYSTYLE", "Files/arial.ttf");
+                gravText.Color = EntityColors.Green;
+                DxfTextStyle textStyle = new DxfTextStyle("MYSTYLE", fontPath);
                 model.TextStyles.Add(textStyle);
                 gravText.Style = textStyle;
 
