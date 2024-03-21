@@ -7,19 +7,30 @@
         mc:Ignorable="d"
         Title="Генератор раскроя dxf" Height="720" Width="1280" ResizeMode="CanMinimize">
     <Grid>
-        <Button Width="280" Height="60" Margin="0,0,900,350" Content="Создать папку для сохранения DXF файлов" Click="SaveDxf_Click"/>
-        <TextBlock Name="directory" Width="700" Height="60" Margin="100,0,0,320" Text="Путь к каталогу с DXF файлами" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
-
         <TextBox x:Name="orderNum_int" BorderThickness="3" Margin="0,0,900,500" BorderBrush="Black" Width="280" Height="60" TextAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
         <TextBlock Name="orderNum" Width="280" Height="60" Margin="0,0,320,475" Text="Введите номер заказа" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
 
-        <Button Name="dirRelBtn" Width="280" Height="60" Margin="0,0,900,200" Content="Создать папку для сохранения DXF файлов (Ral)" Click="SaveDxfRal_Click" Visibility="Hidden"/>
-        <TextBlock Name="directoryRal" Width="700" Height="60" Margin="100,0,0,170" Text="Путь к каталогу с DXF файлами (Ral)" TextAlignment="Left" Visibility="Hidden" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
+        <Button Width="280" Height="60" Margin="0,0,900,350" Click="SaveDxf_Click">
+            <TextBlock TextAlignment="Center" FontSize="15" FontFamily="Comic Sans MS"> Создать папку для сохранения<LineBreak/>DXF файлов внутренних листов</TextBlock>
+        </Button>
+        <TextBlock Name="directory" Width="700" Height="60" Margin="100,0,0,320" Text="Путь к каталогу с DXF файлами внутренних листов" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
 
-        <Button Name="MA" Width="120" Height="60" Margin="0,0,1060,50" Content="MountAir" Click="MountAir_Click" Visibility="Hidden"/>
-        <Button Name="AW" Width="120" Height="60" Margin="0,0,740,50" Content="AirWay" Click="AirWay_Click" Visibility="Hidden"/>
+        <Button Name="dirRelBtn" Width="280" Height="60" Margin="0,0,900,200" Click="SaveDxfRal_Click" Visibility="Hidden">
+            <TextBlock TextAlignment="Center" FontSize="15" FontFamily="Comic Sans MS"> Создать папку для сохранения<LineBreak/>DXF файлов наружных листов</TextBlock>
+        </Button>
+        <TextBlock Name="directoryRal" Width="700" Height="60" Margin="100,0,0,170" Text="Путь к каталогу с DXF файлами наружных листов" TextAlignment="Left" Visibility="Hidden" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
 
-        <Button Name="excbtn" Width="280" Height="60" Margin="0,100,900,0" Content="Загрузить файл Excel из программы куб" Click="OpenCubeExcel_Click" Visibility="Hidden"/>
+        <Button Name="MA" Width="120" Height="60" Margin="0,0,1060,50" Content="MountAir" Click="MountAir_Click" Visibility="Hidden" FontSize="15" FontFamily="Comic Sans MS"/>
+        <Button Name="AW" Width="120" Height="60" Margin="0,0,740,50" Content="AirWay" Click="AirWay_Click" Visibility="Hidden" FontSize="15" FontFamily="Comic Sans MS"/>
+
+        <Button Name="excbtn" Width="280" Height="60" Margin="0,100,900,0" Click="OpenCubeExcel_Click" Visibility="Hidden" FontSize="15" FontFamily="Comic Sans MS">
+            <TextBlock TextAlignment="Center" FontSize="15" FontFamily="Comic Sans MS">Загрузить файл Excel<LineBreak/>из программы Куб</TextBlock>
+        </Button>
         <TextBlock Name="excel_path" Width="380" Margin="0,130,230,0" Height="60" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS" Visibility="Hidden" Foreground="Black"/>
+        <TextBlock Name="version" Width="280" Height="60"  Margin="0,620,900,0" TextAlignment="Left" VerticalAlignment="Center" FontSize="13" FontFamily="Comic Sans MS"/>
+
+        <Button Name="AllClear" Width="280" Height="60" Margin="0,480,900,0" Click="AllClear_Click" FontSize="15" FontFamily="Comic Sans MS">
+            <TextBlock TextAlignment="Center" FontSize="15" FontFamily="Comic Sans MS">Очистить все поля</TextBlock>
+        </Button>
     </Grid>
 </Window>
