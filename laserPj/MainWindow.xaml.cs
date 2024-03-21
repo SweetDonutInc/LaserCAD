@@ -352,7 +352,7 @@ namespace laserPj
             }
 
             gravText.Color = EntityColors.Green;
-            DxfTextStyle textStyle = new DxfTextStyle("MYSTYLE", "Files/ISOCPEUR.ttf");
+            DxfTextStyle textStyle = new DxfTextStyle("MYSTYLE", fontPath);
             model.TextStyles.Add(textStyle);
             gravText.Style = textStyle;
 
