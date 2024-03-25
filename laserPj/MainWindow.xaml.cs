@@ -32,7 +32,7 @@ namespace laserPj
         public MainWindow()
         {
             InitializeComponent();
-            version.Text = "Версия 1.2";
+            version.Text = "Версия 1.3";
         }
 
         private void OpenCubeExcel_Click(object sender, RoutedEventArgs e)
@@ -140,7 +140,7 @@ namespace laserPj
                     //Добавляем круг если есть
                     if (tempExcelList[i].isD == 1)
                     {
-                        model.Entities.Add(new DxfCircle(new Point2D(tempExcelList[i].width / 2, tempExcelList[i].height / 2), 100));
+                        model.Entities.Add(new DxfCircle(new Point2D(tw / 2, th / 2), 100));
                     }
                     //Круг добавлен
 
@@ -219,7 +219,7 @@ namespace laserPj
                     //Добавляем круг если есть
                     if (tempExcelList[i].isD == 1)
                     {
-                        model.Entities.Add(new DxfCircle(new Point2D(tempExcelList[i].width / 2, tempExcelList[i].height / 2), 100));
+                        model.Entities.Add(new DxfCircle(new Point2D(tw / 2, th / 2), 100));
                     }
 
                     string t = "";
@@ -383,6 +383,7 @@ namespace laserPj
         private void AllClear_Click(object sender, RoutedEventArgs e)
         {
             orderNum_int.Clear();
+            excelList.Clear();
 
             directory.Text = "Пусть к каталогу с DXF файлами внутренних листов";
 
