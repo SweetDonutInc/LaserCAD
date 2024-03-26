@@ -15,16 +15,19 @@ using WW.Cad.Model.Entities;
 using WW.Cad.Model.Tables;
 using WW.Math;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Controls;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace laserPj
 {
     public partial class MainWindow : Window
     {
-
         private readonly string fontPath = "Files/ISOCPEUR.ttf"; //Шрифт
         private readonly double fontSize = 8d; //Размер шрифта
+        
 
         List<ExcelCubeData> excelList = new List<ExcelCubeData>(); //В этот лист записываются строки из таблицы Ecxel, сгенерированной в Кубе
         public bool isMountAir { get; set; }
@@ -32,7 +35,7 @@ namespace laserPj
         public MainWindow()
         {
             InitializeComponent();
-            version.Text = "Версия 1.3";
+            version.Text = "Версия 1.4";
         }
 
         private void OpenCubeExcel_Click(object sender, RoutedEventArgs e)
@@ -89,6 +92,12 @@ namespace laserPj
                         });
                     }
                 }
+                progressBar.Minimum = 0;
+                progressBar.Maximum = excelList.Count;
+
+                pbText.Visibility = Visibility.Visible;
+                progressBar.Visibility = Visibility.Visible;
+
                 if (isMountAir)
                 {
                     MountAir_createFilesForCad(excelList);
@@ -104,13 +113,12 @@ namespace laserPj
             }
         }
 
-        private void MountAir_createFilesForCad(List<ExcelCubeData> excelList) // Метод для создания файлов dxf MA
+        private async void MountAir_createFilesForCad(List<ExcelCubeData> excelList) // Метод для создания файлов dxf MA
         {
             List<ExcelCubeData> tempExcelList = new List<ExcelCubeData>(excelList); // Копия основного листа со всеми строками (для удобства работы)
-
             try
             {
-                for (int i = 0; i < tempExcelList.Count; i++)
+                for (int i = 0; i < excelList.Count; i++)
                 {
                     DxfModel model = new DxfModel(); // Создаём пустой файл
                     int border = tempExcelList[i].name.Contains("35мм") ? 35 : 23; //Если в названии встречается 35мм, то борты 35мм, иначе - 23мм
@@ -147,23 +155,22 @@ namespace laserPj
                     if (tempExcelList[i].type.Contains("Створка")) t = "О";
 
                     //Добавляем гравировку
-                    model = AddGrav(model, tempExcelList[i].mark, t, tempExcelList[i].width, tempExcelList[i].height, tempExcelList[i].article, newWidth, border, newHeight);
+                    //model = AddGrav(model, tempExcelList[i].mark, t, tempExcelList[i].width, tempExcelList[i].height, tempExcelList[i].article, newWidth, border, newHeight);
 
                     //Собираем имя файла
 
                     string filename = Filename(tempExcelList[i].name, hw, hh, tempExcelList[i].lineNum, tempExcelList[i].mark, t,
                         tempExcelList[i].width, tempExcelList[i].height, tempExcelList[i].article, tempExcelList[i].count);
 
-                    //Записываем файл
-                    if (tempExcelList[i].article.ToLower().StartsWith("наруж"))
-                    {
-                        DxfWriter.Write($@"{directoryRal.Text}\{filename}.dxf", model);
-                    }
-                    else
-                    {
-                        DxfWriter.Write($@"{directory.Text}\{filename}.dxf", model);
-                    }
+                    ////Записываем файл
+                    bool checkPanel = tempExcelList[i].name.Contains("П54");
+                    SaveAllFiles(checkPanel, filename, model, tempExcelList[i].article.ToLower().StartsWith("наруж"));
+
+                    progressBar.Value = i + 1;
+                    pbText.Text = $"{progressBar.Value}/{excelList.Count}";
+                    await Task.Delay(1);
                 }
+
 
                 excel_path.Text = "Файлы по листу МА успешно созданы";
                 excel_path.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
@@ -174,7 +181,7 @@ namespace laserPj
             }
         }
 
-        private void AirWay_createFilesForCad(List<ExcelCubeData> excelList) // Метод для создания файлов dxf AW
+        private async void AirWay_createFilesForCad(List<ExcelCubeData> excelList) // Метод для создания файлов dxf AW
         {
             List<ExcelCubeData> tempExcelList = new List<ExcelCubeData>(excelList); // Копия основного листа со всеми строками (для удобства работы)
 
@@ -230,14 +237,12 @@ namespace laserPj
                         tempExcelList[i].width, tempExcelList[i].height, tempExcelList[i].article, tempExcelList[i].count);
 
                     //Записываем файл
-                    if (tempExcelList[i].article.ToLower().StartsWith("наруж"))
-                    {
-                        DxfWriter.Write($@"{directoryRal.Text}\{filename}.dxf", model);
-                    }
-                    else
-                    {
-                        DxfWriter.Write($@"{directory.Text}\{filename}.dxf", model);
-                    }
+                    bool checkPanel = tempExcelList[i].name.Contains("П54");
+                    SaveAllFiles(checkPanel, filename, model, tempExcelList[i].article.ToLower().StartsWith("наруж"));
+
+                    progressBar.Value = i + 1;
+                    pbText.Text = $"{progressBar.Value}/{excelList.Count}";
+                    await Task.Delay(1);
                 }
 
                 excel_path.Text = "Файлы по листу AW успешно созданы";
@@ -257,23 +262,18 @@ namespace laserPj
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(saveFileDialog1.FileName);
                 dirInfo.Create();
-                directory.Text = dirInfo.FullName;
-                directoryRal.Visibility = Visibility.Visible;
-                dirRelBtn.Visibility = Visibility.Visible;
-            }
-        }
 
-        private void SaveDxfRal_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-            saveFileDialog1.Title = "Создать папку проекта";
-            if (saveFileDialog1.ShowDialog() == true)
-            {
-                DirectoryInfo dirInfo = new DirectoryInfo(saveFileDialog1.FileName);
-                dirInfo.Create();
-                directoryRal.Text = dirInfo.FullName;
-                MA.Visibility = Visibility.Visible;
+                DirectoryInfo dw1 = new DirectoryInfo(saveFileDialog1.FileName + "/П54 внешние");
+                dw1.Create();
+                DirectoryInfo dw2 = new DirectoryInfo(saveFileDialog1.FileName + "/П54 внутренние");
+                dw2.Create();
+                DirectoryInfo dw3 = new DirectoryInfo(saveFileDialog1.FileName + "/П42 внешние");
+                dw3.Create();
+                DirectoryInfo dw4 = new DirectoryInfo(saveFileDialog1.FileName + "/П42 внутренние");
+                dw4.Create();
+                directory.Text = dirInfo.FullName;
                 AW.Visibility = Visibility.Visible;
+                MA.Visibility = Visibility.Visible;
             }
         }
 
@@ -382,6 +382,27 @@ namespace laserPj
             return filename;
         }
 
+        //Сохраняем рисунки в файлы
+        private void SaveAllFiles(bool BigPanel, string filename, DxfModel model, bool outside)
+        {
+            if (BigPanel && outside)
+            {
+                DxfWriter.Write($@"{directory.Text}\П54 внешние\{filename}.dxf", model);
+            }
+            else if (BigPanel && !outside)
+            {
+                DxfWriter.Write($@"{directory.Text}\П54 внутренние\{filename}.dxf", model);
+            }
+            else if (!BigPanel && outside)
+            {
+                DxfWriter.Write($@"{directory.Text}\П42 внешние\{filename}.dxf", model);
+            }
+            else
+            {
+                DxfWriter.Write($@"{directory.Text}\П42 внутренние\{filename}.dxf", model);
+            }
+        }
+
         private void AllClear_Click(object sender, RoutedEventArgs e)
         {
             orderNum_int.Clear();
@@ -389,13 +410,15 @@ namespace laserPj
 
             directory.Text = "Пусть к каталогу с DXF файлами внутренних листов";
 
-            dirRelBtn.Visibility = Visibility.Hidden;
-            directoryRal.Text = "";
-
             MA.Visibility = Visibility.Hidden;
             MA.Opacity = 1f;
             AW.Visibility = Visibility.Hidden;
             AW.Opacity = 1f;
+
+            progressBar.Value = 0;
+            pbText.Text = "0/0";
+            pbText.Visibility = Visibility.Hidden;
+            progressBar.Visibility = Visibility.Hidden;
 
             excbtn.Visibility = Visibility.Hidden;
             excel_path.Text = "";
@@ -418,5 +441,5 @@ namespace laserPj
         public double holeWidth; //Ширина выреза
         public double holeHeight; //Высота выреза
         public int isD;
-    }
+    }    
 }
