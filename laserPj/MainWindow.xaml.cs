@@ -138,10 +138,7 @@ namespace laserPj
                     //Вырез добавлен
 
                     //Добавляем круг если есть
-                    if (tempExcelList[i].isD == 1)
-                    {
-                        model.Entities.Add(new DxfCircle(new Point2D(tw / 2, th / 2), 100));
-                    }
+                    if (tempExcelList[i].isD == 1) model = AddCircle(model, tw, th);
                     //Круг добавлен
 
                     string t = "";
@@ -217,10 +214,8 @@ namespace laserPj
                     //Вырез добавлен
 
                     //Добавляем круг если есть
-                    if (tempExcelList[i].isD == 1)
-                    {
-                        model.Entities.Add(new DxfCircle(new Point2D(tw / 2, th / 2), 100));
-                    }
+                    if (tempExcelList[i].isD == 1) model = AddCircle(model, tw, th);
+                    //Круг добавлен
 
                     string t = "";
                     if (tempExcelList[i].type.Contains("Глухая")) t = "Г";
@@ -325,6 +320,13 @@ namespace laserPj
             model.Entities.Add(new DxfLine(new Point2D(n, m + hh), new Point2D(n + hw, m + hh)));
             model.Entities.Add(new DxfLine(new Point2D(n + hw, m + hh), new Point2D(n + hw, m)));
             model.Entities.Add(new DxfLine(new Point2D(n + hw, m), new Point2D(n, m)));
+            return model;
+        }
+
+        //Добавляем круговой вырез
+        private DxfModel AddCircle(DxfModel model, double tw, double th)
+        {
+            model.Entities.Add(new DxfCircle(new Point2D(tw / 2, th / 2), 100));
             return model;
         }
 
