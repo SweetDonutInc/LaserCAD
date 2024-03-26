@@ -393,7 +393,9 @@ namespace laserPj
             directoryRal.Text = "";
 
             MA.Visibility = Visibility.Hidden;
+            MA.Opacity = 1f;
             AW.Visibility = Visibility.Hidden;
+            AW.Opacity = 1f;
 
             excbtn.Visibility = Visibility.Hidden;
             excel_path.Text = "";
