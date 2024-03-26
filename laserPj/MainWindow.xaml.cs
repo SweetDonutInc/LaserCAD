@@ -20,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Controls;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace laserPj
 {
@@ -171,6 +172,13 @@ namespace laserPj
                     await Task.Delay(1);
                 }
 
+                if (MessageBox.Show("Открыть папку с файлами?",
+                    "Открыть папку",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    Process.Start("explorer.exe", $"{directory.Text}");
+                }
 
                 excel_path.Text = "Файлы по листу МА успешно созданы";
                 excel_path.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
@@ -244,7 +252,13 @@ namespace laserPj
                     pbText.Text = $"{progressBar.Value}/{excelList.Count}";
                     await Task.Delay(1);
                 }
-
+                if (MessageBox.Show("Открыть папку с файлами?",
+                    "Открыть папку",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    Process.Start("explorer.exe", $"{directory.Text}");
+                }
                 excel_path.Text = "Файлы по листу AW успешно созданы";
                 excel_path.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
             }
