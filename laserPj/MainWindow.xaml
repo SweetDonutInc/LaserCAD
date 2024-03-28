@@ -5,15 +5,84 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:laserPj"
         mc:Ignorable="d"
-        Title="Генератор раскроя dxf" Height="720" Width="1280" ResizeMode="CanMinimize">
-    <Grid>
-        <TextBox x:Name="orderNum_int" BorderThickness="3" Margin="0,0,900,500" BorderBrush="Black" Width="280" Height="60" TextAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
-        <TextBlock Name="orderNum" Width="280" Height="60" Margin="0,0,320,475" Text="Введите номер заказа" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
+        Title="LaserCad" Height="720" Width="1280" ResizeMode="CanMinimize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Button" x:Name="ButtonTamplate">
+                <Setter Property="FontFamily" Value="Comic Sans MS"/>
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="10">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#FFF9913E"/>
+                    </Trigger>
+                    <Trigger Property="IsMouseOver" Value="False">
+                        <Setter Property="Background" Value="#FFF57E20"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="{x:Type ProgressBar}" TargetType="{x:Type ProgressBar}">
+                <Setter Property="Foreground" Value="#F57D1F"/>
+                <Setter Property="Background" Value="#FF3C424B"/>
+                <Setter Property="Height" Value="15"/>
+                <Setter Property="Border.CornerRadius" Value="8"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ProgressBar}">
+                            <Border CornerRadius="{TemplateBinding Border.CornerRadius}" Background="{TemplateBinding Background}">
+                                <Grid>
+                                    <Rectangle Name="PART_Track"/>
+                                    <Decorator x:Name="PART_Indicator" HorizontalAlignment="Left">
+                                        <Border Background="{TemplateBinding Foreground}" CornerRadius="{TemplateBinding Border.CornerRadius}">
+                                        </Border>
+                                    </Decorator>
+                                </Grid>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Background="#222831">
+        <TextBox x:Name="orderNum_int"
+                 BorderThickness="3"
+                 Margin="0,0,900,500"
+                 BorderBrush="Black"
+                 Width="280"
+                 Height="60"
+                 TextAlignment="Center"
+                 VerticalContentAlignment="Center"
+                 VerticalAlignment="Center"
+                 FontSize="20"
+                 FontFamily="Comic Sans MS"/>
+        
+        <TextBlock Name="orderNum"
+                   Width="280" 
+                   Height="60"
+                   Margin="0,0,320,475"
+                   Text="Введите номер заказа"
+                   TextAlignment="Left"
+                   VerticalAlignment="Center"
+                   FontSize="20"
+                   FontFamily="Comic Sans MS"
+                   Foreground="#EEEEEE"/>
 
         <Button Width="280" Height="60" Margin="0,0,900,350" Click="SaveDxf_Click">
-            <TextBlock TextAlignment="Center" FontSize="15" FontFamily="Comic Sans MS"> Создать папку рабочую папку<LineBreak/>для сохранения DXF файлов</TextBlock>
+            <TextBlock TextAlignment="Center" FontSize="15" FontFamily="Comic Sans MS"> Создать рабочую папку<LineBreak/>для сохранения DXF файлов</TextBlock>
         </Button>
-        <TextBlock Name="directory" Width="700" Height="60" Margin="100,0,0,320" Text="Путь к каталогу с DXF файлами внутренних листов" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS"/>
+        <TextBlock Name="directory" Width="700" Height="60" Margin="100,0,0,320" Text="Путь к каталогу с DXF файлами внутренних листов" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS" Foreground="#EEEEEE"/>
 
         <Button Name="MA" Width="120" Height="60" Margin="0,0,1060,200" Content="MountAir" Click="MountAir_Click" Visibility="Hidden" FontSize="15" FontFamily="Comic Sans MS"/>
         <Button Name="AW" Width="120" Height="60" Margin="0,0,740,200" Content="AirWay" Click="AirWay_Click" Visibility="Hidden" FontSize="15" FontFamily="Comic Sans MS"/>
@@ -21,15 +90,41 @@
         <Button Name="excbtn" Width="280" Height="60" Margin="0,0,900,50" Click="OpenCubeExcel_Click" Visibility="Hidden" FontSize="15" FontFamily="Comic Sans MS">
             <TextBlock TextAlignment="Center" FontSize="15" FontFamily="Comic Sans MS">Загрузить файл Excel<LineBreak/>из программы Куб</TextBlock>
         </Button>
+
+        <TextBlock Name="excel_path"
+                   Width="380"
+                   Margin="0,0,220,20"
+                   Height="60"
+                   TextAlignment="Left"
+                   VerticalAlignment="Center"
+                   FontSize="20"
+                   FontFamily="Comic Sans MS"
+                   Visibility="Hidden"
+                   Foreground="#EEEEEE"/>
         
-        <TextBlock Name="excel_path" Width="380" Margin="0,0,220,20" Height="60" TextAlignment="Left" VerticalAlignment="Center" FontSize="20" FontFamily="Comic Sans MS" Visibility="Hidden" Foreground="Black"/>
-        <TextBlock Name="version" Width="280" Height="60"  Margin="0,620,900,0" TextAlignment="Left" VerticalAlignment="Center" FontSize="13" FontFamily="Comic Sans MS"/>
+        <TextBlock Name="version"
+                   Width="280"
+                   Height="60"
+                   Margin="0,620,900,0"
+                   TextAlignment="Left"
+                   VerticalAlignment="Center"
+                   FontSize="13"
+                   FontFamily="Comic Sans MS"
+                   Foreground="#EEEEEE"/>
 
         <Button Name="AllClear" Width="280" Height="60" Margin="0,480,900,0" Click="AllClear_Click" FontSize="15" FontFamily="Comic Sans MS">
             <TextBlock TextAlignment="Center" FontSize="15" FontFamily="Comic Sans MS">Очистить все поля</TextBlock>
         </Button>
-        
-        <ProgressBar Name="progressBar" Minimum="0" Width="280" Height="50" Margin="0,100,900,0" Visibility="Hidden" BorderBrush="Black" BorderThickness="2"/>
-        <TextBlock Name="pbText" Width="280" Height="50" Margin="0,135,900,0" TextAlignment="Center" Visibility="Hidden" FontSize="13" FontFamily="Comic Sans MS"/>
+
+        <ProgressBar Name="progressBar" Minimum="0" Width="280" Height="60" Margin="0,100,900,0" Visibility="Hidden"/>
+        <TextBlock Name="pbText"
+                   Width="280"
+                   Height="50"
+                   Margin="0,130,900,0"
+                   TextAlignment="Center"
+                   Visibility="Hidden"
+                   FontSize="15"
+                   FontFamily="Comic Sans MS"
+                   FontWeight="SemiBold"/>
     </Grid>
 </Window>

@@ -36,7 +36,7 @@ namespace laserPj
         public MainWindow()
         {
             InitializeComponent();
-            version.Text = "Версия 1.4";
+            version.Text = "Версия 1.5";
         }
 
         private void OpenCubeExcel_Click(object sender, RoutedEventArgs e)
@@ -74,7 +74,31 @@ namespace laserPj
                 for (int i = 4; i < sheet.LastRowNum; i++) // Первые 4 строки не содержат данных, поэтому начинаем с 4 индекса (5 строка)
                 {
                     // Добавляем в лист всё, что содержит борты
-                    if (sheet.GetRow(i).GetCell(3).StringCellValue.Contains("борты"))
+                    if (isMountAir)
+                    {
+                        if (sheet.GetRow(i).GetCell(3).StringCellValue.Contains("борты"))
+                        {
+                            excelList.Add(new ExcelCubeData
+                            {
+                                lineNum = i + 1,
+                                mark = sheet.GetRow(i).GetCell(0).StringCellValue,
+                                type = sheet.GetRow(i).GetCell(1).StringCellValue,
+                                article = sheet.GetRow(i).GetCell(2).StringCellValue,
+                                name = sheet.GetRow(i).GetCell(3).StringCellValue,
+                                width = (int)sheet.GetRow(i).GetCell(4).NumericCellValue,
+                                height = (int)sheet.GetRow(i).GetCell(5).NumericCellValue,
+                                count = (int)sheet.GetRow(i).GetCell(6).NumericCellValue,
+                                mass = (int)sheet.GetRow(i).GetCell(7).NumericCellValue,
+                                holeWidth = sheet.GetRow(i).GetCell(8).NumericCellValue,
+                                holeHeight = sheet.GetRow(i).GetCell(9).NumericCellValue,
+                                isD = (int)sheet.GetRow(i).GetCell(10).NumericCellValue
+                            });
+                        }
+                    }
+                    else if(sheet.GetRow(i).GetCell(3).StringCellValue.Contains("борты 23") ||
+                        sheet.GetRow(i).GetCell(3).StringCellValue.Contains("борты 24") ||
+                        sheet.GetRow(i).GetCell(3).StringCellValue.Contains("борты 43") ||
+                        sheet.GetRow(i).GetCell(3).StringCellValue.Contains("борты 44"))
                     {
                         excelList.Add(new ExcelCubeData
                         {
@@ -128,7 +152,7 @@ namespace laserPj
                     int newHeight = tempExcelList[i].height - (2 * border); // Высота листа без бортов
 
                     // Рисуем линии основной фигуры
-                    model = PerimetrDrawing(model, border, newWidth, newHeight);
+                    model = PerimetrDrawing(false ,model, border, newWidth, newHeight);
                     // Линии нарисованы
 
                     //Добавляем вырез
@@ -156,7 +180,7 @@ namespace laserPj
                     if (tempExcelList[i].type.Contains("Створка")) t = "О";
 
                     //Добавляем гравировку
-                    //model = AddGrav(model, tempExcelList[i].mark, t, tempExcelList[i].width, tempExcelList[i].height, tempExcelList[i].article, newWidth, border, newHeight);
+                    model = AddGrav(model, tempExcelList[i].mark, t, tempExcelList[i].width, tempExcelList[i].height, tempExcelList[i].article, newWidth, border, newHeight);
 
                     //Собираем имя файла
 
@@ -168,9 +192,12 @@ namespace laserPj
                     SaveAllFiles(checkPanel, filename, model, tempExcelList[i].article.ToLower().StartsWith("наруж"));
 
                     progressBar.Value = i + 1;
-                    pbText.Text = $"{progressBar.Value}/{excelList.Count}";
+                    double percent = Math.Round(progressBar.Value / excelList.Count * 100, 1);
+                    pbText.Text = $"{progressBar.Value}/{excelList.Count} ({percent}%)";
                     await Task.Delay(1);
                 }
+
+                excel_path.Text = "Файлы по листу МА успешно созданы";
 
                 if (MessageBox.Show("Открыть папку с файлами?",
                     "Открыть папку",
@@ -179,9 +206,6 @@ namespace laserPj
                 {
                     Process.Start("explorer.exe", $"{directory.Text}");
                 }
-
-                excel_path.Text = "Файлы по листу МА успешно созданы";
-                excel_path.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
             }
             catch
             {
@@ -198,18 +222,19 @@ namespace laserPj
                 for (int i = 0; i < tempExcelList.Count; i++)
                 {
                     DxfModel model = new DxfModel(); // Создаём пустой файл
-
                     int border = 0;
                     if (tempExcelList[i].name.Contains("23мм")) border = 23;
-                    if (tempExcelList[i].name.Contains("24мм")) border = 24;
-                    if (tempExcelList[i].name.Contains("43мм")) border = 43;
-                    if (tempExcelList[i].name.Contains("44мм")) border = 44;
+                    else if (tempExcelList[i].name.Contains("24мм")) border = 24;
+                    else if (tempExcelList[i].name.Contains("43мм")) border = 43;
+                    else if (tempExcelList[i].name.Contains("44мм")) border = 44;
 
                     int newWidth = tempExcelList[i].width - (2 * border); // Ширина листа без бортов
                     int newHeight = tempExcelList[i].height - (2 * border); // Высота листа без бортов
 
+                    bool checkOutside = tempExcelList[i].article.ToLower().StartsWith("наруж");
+
                     // Рисуем линии по точкам
-                    model = PerimetrDrawing(model, border, newWidth, newHeight);
+                    model = PerimetrDrawing(checkOutside, model, border, newWidth, newHeight);
                     // Линии нарисованы
 
                     //Добавляем вырез
@@ -249,9 +274,13 @@ namespace laserPj
                     SaveAllFiles(checkPanel, filename, model, tempExcelList[i].article.ToLower().StartsWith("наруж"));
 
                     progressBar.Value = i + 1;
-                    pbText.Text = $"{progressBar.Value}/{excelList.Count}";
+                    double percent = Math.Round(progressBar.Value / excelList.Count * 100, 1);
+                    pbText.Text = $"{progressBar.Value}/{excelList.Count} ({percent}%)";
                     await Task.Delay(1);
                 }
+
+                excel_path.Text = "Файлы по листу AW успешно созданы";
+
                 if (MessageBox.Show("Открыть папку с файлами?",
                     "Открыть папку",
                     MessageBoxButton.YesNo,
@@ -259,8 +288,6 @@ namespace laserPj
                 {
                     Process.Start("explorer.exe", $"{directory.Text}");
                 }
-                excel_path.Text = "Файлы по листу AW успешно созданы";
-                excel_path.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Green);
             }
             catch
             {
@@ -277,11 +304,11 @@ namespace laserPj
                 DirectoryInfo dirInfo = new DirectoryInfo(saveFileDialog1.FileName);
                 dirInfo.Create();
 
-                DirectoryInfo dw1 = new DirectoryInfo(saveFileDialog1.FileName + "/П54 внешние");
+                DirectoryInfo dw1 = new DirectoryInfo(saveFileDialog1.FileName + "/П54 наружные");
                 dw1.Create();
                 DirectoryInfo dw2 = new DirectoryInfo(saveFileDialog1.FileName + "/П54 внутренние");
                 dw2.Create();
-                DirectoryInfo dw3 = new DirectoryInfo(saveFileDialog1.FileName + "/П42 внешние");
+                DirectoryInfo dw3 = new DirectoryInfo(saveFileDialog1.FileName + "/П42 наружные");
                 dw3.Create();
                 DirectoryInfo dw4 = new DirectoryInfo(saveFileDialog1.FileName + "/П42 внутренние");
                 dw4.Create();
@@ -310,20 +337,71 @@ namespace laserPj
         }
 
         //Рисуем периметр листа
-        private DxfModel PerimetrDrawing(DxfModel model, int border, int newWidth, int newHeight)
+        private DxfModel PerimetrDrawing(bool checkOutside, DxfModel model, int border, int newWidth, int newHeight)
         {
-            model.Entities.Add(new DxfLine(new Point2D(0, border), new Point2D(0, newHeight + border)));
-            model.Entities.Add(new DxfLine(new Point2D(0, newHeight + border), new Point2D(border, newHeight + border)));
-            model.Entities.Add(new DxfLine(new Point2D(border, newHeight + border), new Point2D(border, newHeight + (2 * border))));
-            model.Entities.Add(new DxfLine(new Point2D(border, newHeight + (2 * border)), new Point2D(newWidth + border, newHeight + (2 * border))));
-            model.Entities.Add(new DxfLine(new Point2D(newWidth + border, newHeight + (2 * border)), new Point2D(newWidth + border, newHeight + border)));
-            model.Entities.Add(new DxfLine(new Point2D(newWidth + border, newHeight + border), new Point2D(newWidth + (2 * border), newHeight + border)));
-            model.Entities.Add(new DxfLine(new Point2D(newWidth + (2 * border), newHeight + border), new Point2D(newWidth + (2 * border), border)));
-            model.Entities.Add(new DxfLine(new Point2D(newWidth + (2 * border), border), new Point2D(newWidth + border, border)));
-            model.Entities.Add(new DxfLine(new Point2D(newWidth + border, border), new Point2D(newWidth + border, 0)));
-            model.Entities.Add(new DxfLine(new Point2D(newWidth + border, 0), new Point2D(border, 0)));
-            model.Entities.Add(new DxfLine(new Point2D(border, 0), new Point2D(border, border)));
-            model.Entities.Add(new DxfLine(new Point2D(border, border), new Point2D(0, border)));
+            if (!checkOutside)
+            {
+                model.Entities.Add(new DxfLine(new Point2D(0, border), new Point2D(0, newHeight + border)));
+                model.Entities.Add(new DxfLine(new Point2D(0, newHeight + border), new Point2D(border, newHeight + border)));
+                model.Entities.Add(new DxfLine(new Point2D(border, newHeight + border), new Point2D(border, newHeight + (2 * border))));
+                model.Entities.Add(new DxfLine(new Point2D(border, newHeight + (2 * border)), new Point2D(newWidth + border, newHeight + (2 * border))));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + border, newHeight + (2 * border)), new Point2D(newWidth + border, newHeight + border)));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + border, newHeight + border), new Point2D(newWidth + (2 * border), newHeight + border)));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + (2 * border), newHeight + border), new Point2D(newWidth + (2 * border), border)));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + (2 * border), border), new Point2D(newWidth + border, border)));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + border, border), new Point2D(newWidth + border, 0)));
+                model.Entities.Add(new DxfLine(new Point2D(newWidth + border, 0), new Point2D(border, 0)));
+                model.Entities.Add(new DxfLine(new Point2D(border, 0), new Point2D(border, border)));
+                model.Entities.Add(new DxfLine(new Point2D(border, border), new Point2D(0, border)));
+            }
+            else
+            {
+                double xG = border - 5.1; // Опорная точка меньшего треугольника
+                double yG = border - 0.1; // Опорная точка большего треугольника
+
+                model.Entities.Add(new DxfLine(new Point2D(border - xG, 0), new Point2D(border - xG, 5)));
+                model.Entities.Add(new DxfLine(new Point2D(border - xG, 5), new Point2D(yG, yG)));
+                model.Entities.Add(new DxfLine(new Point2D(yG, yG), new Point2D(yG + 0.1, yG)));
+                model.Entities.Add(new DxfArc(new Point3D(border, border, 0), 0.1, -Math.PI/2, Math.PI/2));
+
+                model.Entities.Add(new DxfLine(new Point2D(border, border + 0.1), new Point2D(yG, border + 0.1)));
+                model.Entities.Add(new DxfLine(new Point2D(yG, border + 0.1), new Point2D(0, 2 * border)));
+
+                model.Entities.Add(new DxfLine(new Point2D(0, border + border), new Point2D(0, newHeight)));
+                model.Entities.Add(new DxfLine(new Point2D(0, newHeight), new Point2D(yG,newHeight + yG)));
+                model.Entities.Add(new DxfLine(new Point2D(yG, newHeight + yG), new Point2D(border, newHeight + yG)));
+                model.Entities.Add(new DxfArc(new Point3D(border, border + newHeight, 0), 0.1, -Math.PI / 2, Math.PI / 2));
+
+                model.Entities.Add(new DxfLine(new Point2D(border, newHeight + border + 0.1), new Point2D(yG, newHeight + border + 0.1)));
+                model.Entities.Add(new DxfLine(new Point2D(yG, newHeight + border + 0.1), new Point2D(border - xG, newHeight + 2 * border - 5)));
+                model.Entities.Add(new DxfLine(new Point2D(border - xG, newHeight + 2 * border - 5), new Point2D(border - xG, newHeight + 2 * border)));
+                model.Entities.Add(new DxfLine(new Point2D(border - xG, newHeight + 2 * border), new Point2D(border + xG + newWidth, newHeight + 2 * border)));
+                model.Entities.Add(new DxfLine(new Point2D(border + xG + newWidth, newHeight + 2 * border), new Point2D(border + xG + newWidth, newHeight + 2 * border - 5)));
+                model.Entities.Add(new DxfLine(new Point2D(border + xG + newWidth, newHeight + 2 * border - 5), new Point2D(border + newWidth + 0.1, newHeight + border + 0.1)));
+                model.Entities.Add(new DxfLine(new Point2D(border + newWidth + 0.1, newHeight + border + 0.1), new Point2D(border + newWidth, newHeight + border + 0.1)));
+                model.Entities.Add(new DxfArc(new Point3D(border + newWidth, border + newHeight, 0), 0.1, Math.PI / 2, 3 * Math.PI / 2));
+
+                model.Entities.Add(new DxfLine(new Point2D(border + newWidth, newHeight + yG), new Point2D(border + newWidth + 0.1, newHeight + yG)));
+                model.Entities.Add(new DxfLine(new Point2D(border + newWidth + 0.1, newHeight + yG), new Point2D(2 * border + newWidth, newHeight)));
+                model.Entities.Add(new DxfLine(new Point2D(2 * border + newWidth, newHeight), new Point2D(2 * border + newWidth, 2* border)));
+                model.Entities.Add(new DxfLine(new Point2D(2 * border + newWidth, 2 * border), new Point2D(border + newWidth + 0.1, border + 0.1)));
+                model.Entities.Add(new DxfLine(new Point2D(border + newWidth + 0.1, border + 0.1), new Point2D(border + newWidth, border + 0.1)));
+                model.Entities.Add(new DxfArc(new Point3D(border + newWidth, border, 0), 0.1, Math.PI / 2, 3 * Math.PI / 2));
+
+                model.Entities.Add(new DxfLine(new Point2D(border + newWidth, yG), new Point2D(border + newWidth + 0.1, yG)));
+                model.Entities.Add(new DxfLine(new Point2D(border + newWidth + 0.1, yG), new Point2D(border + xG + newWidth, 5)));
+                model.Entities.Add(new DxfLine(new Point2D(border + xG + newWidth, 5), new Point2D(border + xG + newWidth, 0)));
+                model.Entities.Add(new DxfLine(new Point2D(border + xG + newWidth, 0), new Point2D(border - xG, 0)));
+
+                model.Entities.Add(new DxfCircle(new Point2D(border - 6.1, 7), 1.8));
+                model.Entities.Add(new DxfCircle(new Point2D(7, 2 * border), 1.8));
+                model.Entities.Add(new DxfCircle(new Point2D(7, newHeight), 1.8));
+                model.Entities.Add(new DxfCircle(new Point2D(border - 6.1, newHeight + 2 * border - 7), 1.8));
+                model.Entities.Add(new DxfCircle(new Point2D(border + newWidth + 6.1, newHeight + 2 * border - 7), 1.8));
+                model.Entities.Add(new DxfCircle(new Point2D(2 * border + newWidth - 7, newHeight), 1.8));
+                model.Entities.Add(new DxfCircle(new Point2D(2 * border + newWidth - 7, 2 * border), 1.8));
+                model.Entities.Add(new DxfCircle(new Point2D(border + newWidth + 6.1, 7), 1.8));
+            }
             return model;
         }
 
@@ -401,7 +479,7 @@ namespace laserPj
         {
             if (BigPanel && outside)
             {
-                DxfWriter.Write($@"{directory.Text}\П54 внешние\{filename}.dxf", model);
+                DxfWriter.Write($@"{directory.Text}\П54 наружные\{filename}.dxf", model);
             }
             else if (BigPanel && !outside)
             {
@@ -409,7 +487,7 @@ namespace laserPj
             }
             else if (!BigPanel && outside)
             {
-                DxfWriter.Write($@"{directory.Text}\П42 внешние\{filename}.dxf", model);
+                DxfWriter.Write($@"{directory.Text}\П42 наружные\{filename}.dxf", model);
             }
             else
             {
